@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { AccessKeyCache } from 'src/common/access-key-cache';
-import { RateLimiterService } from 'src/rate-limiter.service';
+import { RateLimiterService } from '../core';
 
 @Injectable()
 export class RateLimiterMiddleware implements NestMiddleware {

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { AccessKeyDetails, RequestLogItem, RunningRateLimit } from './models';
-import { redis } from './common';
+import { AccessKeyDetails, RequestLogItem, RunningRateLimit } from '../models';
+import { redis } from '../common';
 import { nanoid } from 'nanoid';
 
 @Injectable()
