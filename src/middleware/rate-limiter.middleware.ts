@@ -5,7 +5,7 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { AccessKeyCache } from 'src/common/access-key-cache';
+import { AccessKeyCache } from '../common/access-key-cache';
 import { RateLimiterService } from '../core';
 
 @Injectable()
