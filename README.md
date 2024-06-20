@@ -39,3 +39,7 @@ npm run test
 ```bash
 npm run test:e2e
 ```
+
+# Assumptions
+
+- The default rate-limiting is done per minute. For extensibility, an interval field is added which can be used to configure the rate-limit as per the interval. This would require some implementation, but should be fairly easy to add to `core/rate-limiter.service.ts`.
