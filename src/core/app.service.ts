@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { AccessKeyCache } from '../common/access-key-cache';
 
 @Injectable()
 export class AppService {
@@ -14,5 +15,17 @@ export class AppService {
         last_updated_at: 1718719199,
       },
     };
+  }
+
+  onApplicationShutdown(signal: string) {
+    console.log(signal); // e.g. "SIGINT"
+    if (
+      signal === 'SIGINT' ||
+      signal === 'SIGTERM' ||
+      signal === 'SIGQUIT' ||
+      signal === 'SIGHUP'
+    ) {
+      AccessKeyCache.shutdownRateLimitReset();
+    }
   }
 }

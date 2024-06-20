@@ -4,6 +4,7 @@ import { AccessKeyCache } from './common/access-key-cache';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableShutdownHooks();
   AccessKeyCache.resetRateLimitBuckets();
   await app.listen(3000);
 }

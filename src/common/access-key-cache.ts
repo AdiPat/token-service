@@ -2,6 +2,8 @@ import { AccessKeyDetails, RunningRateLimit } from '../models';
 import { redis } from '.';
 
 class AccessKeyCache_ {
+  private rateLimitResetInterval: NodeJS.Timeout;
+
   async setAccessKeyDetails(
     accessKeyDetails: AccessKeyDetails,
   ): Promise<boolean> {
@@ -26,7 +28,7 @@ class AccessKeyCache_ {
   }
 
   async resetRateLimitBuckets(): Promise<void> {
-    setInterval(async () => {
+    this.rateLimitResetInterval = setInterval(async () => {
       const keys = await redis.keys('rateLimit:*');
       keys.map(async (key) => {
         const runningRateLimitsJson = await redis.get(key);
@@ -43,6 +45,10 @@ class AccessKeyCache_ {
         redis.set(key, JSON.stringify(runningRateLimits));
       });
     }, 60 * 1000); // hardcoded to update every minute for now
+  }
+
+  async shutdownRateLimitReset(): Promise<void> {
+    clearInterval(this.rateLimitResetInterval);
   }
 }
 
