@@ -13,6 +13,7 @@ export class RateLimiterService {
    *
    */
   async rateLimit(accessKeyDetails: AccessKeyDetails): Promise<void> {
+    const transaction = redis.multi();
     const now = new Date();
 
     if (new Date(accessKeyDetails.expiry).getTime() < now.getTime()) {
@@ -27,7 +28,7 @@ export class RateLimiterService {
         statusCode,
       };
 
-      redis.set(
+      transaction.set(
         `requestLog:${accessKeyDetails.accessKey}`,
         JSON.stringify(requestLog),
       );
@@ -38,21 +39,21 @@ export class RateLimiterService {
       `rateLimit:${accessKeyDetails.accessKey}`,
     );
 
-    const runningRateLimit = JSON.parse(
+    let runningRateLimit: RunningRateLimit = JSON.parse(
       runningRateLimitJson,
     ) as RunningRateLimit;
 
     if (!runningRateLimit) {
-      const newRunningRateLimit: RunningRateLimit = {
+      runningRateLimit = {
         accessKeyValue: accessKeyDetails.accessKey,
         interval: 60,
         remainingLimit: accessKeyDetails.limitPerSecond,
         lastReset: new Date(),
       };
 
-      await redis.set(
+      await transaction.set(
         `rateLimit:${accessKeyDetails.accessKey}`,
-        JSON.stringify(newRunningRateLimit),
+        JSON.stringify(runningRateLimit),
       );
     }
 
@@ -68,7 +69,7 @@ export class RateLimiterService {
         statusCode,
       };
 
-      redis.set(
+      transaction.set(
         `requestLog:${accessKeyDetails.accessKey}`,
         JSON.stringify(requestLog),
       );
@@ -91,7 +92,7 @@ export class RateLimiterService {
         statusCode,
       };
 
-      redis.set(
+      transaction.set(
         `requestLog:${accessKeyDetails.accessKey}`,
         JSON.stringify(requestLog),
       );
@@ -106,9 +107,11 @@ export class RateLimiterService {
       lastReset: lastReset,
     };
 
-    await redis.set(
+    await transaction.set(
       `rateLimit:${accessKeyDetails.accessKey}`,
       JSON.stringify(newRunningRateLimit),
     );
+
+    await transaction.exec();
   }
 }
