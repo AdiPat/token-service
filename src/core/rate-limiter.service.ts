@@ -112,6 +112,21 @@ export class RateLimiterService {
       JSON.stringify(newRunningRateLimit),
     );
 
+    // update request log
+    const requestLog: RequestLogItem = {
+      id: nanoid(),
+      accessKeyValue: accessKeyDetails.accessKey,
+      requestTime: now,
+      rateLimited: false,
+      errorMessage: '',
+      statusCode: HttpStatus.OK,
+    };
+
+    transaction.set(
+      `requestLog:${accessKeyDetails.accessKey}`,
+      JSON.stringify(requestLog),
+    );
+
     await transaction.exec();
   }
 }
