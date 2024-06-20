@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/token/:tokenId')
+  @Get('/tokens/:tokenId')
   getToken(@Param('tokenId') tokenId: string): Promise<any> {
     return this.appService.getToken(tokenId);
   }
