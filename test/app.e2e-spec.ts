@@ -89,19 +89,10 @@ describe('AppController (e2e)', () => {
         `accessKeyDetails:${xApiKey}`,
         JSON.stringify({
           accessKey: xApiKey,
-          limitPerSecond: 1,
+          limit: 0,
+          interval: 60,
           disabled: false,
           expiry: new Date().getTime() + 1000 * 60 * 60 * 24,
-        }),
-      );
-
-      await redis.set(
-        `rateLimit:${xApiKey}`,
-        JSON.stringify({
-          accessKeyValue: xApiKey,
-          interval: 60,
-          remainingLimit: 0,
-          lastReset: new Date(),
         }),
       );
 
@@ -110,33 +101,33 @@ describe('AppController (e2e)', () => {
         .expect(HttpStatus.TOO_MANY_REQUESTS)
         .set('x-api-key', xApiKey);
     });
-  });
 
-  it('/tokens/bitcoin (GET): rate limited key fails with TOO_MANY_REQUESTS for multiple requests', async () => {
-    const requestLimit = 10;
+    it('/tokens/bitcoin (GET): rate limited key fails with TOO_MANY_REQUESTS for multiple requests', async () => {
+      const requestLimit = 10;
 
-    await redis.flushdb();
-    const xApiKey = 'ratelimitedkey';
-    await redis.set(
-      `accessKeyDetails:${xApiKey}`,
-      JSON.stringify({
-        accessKey: xApiKey,
-        limitPerSecond: requestLimit, // this should be limit per min
-        disabled: false,
-        expiry: new Date().getTime() + 1000 * 60 * 60 * 24,
-      }),
-    );
+      await redis.flushdb();
+      const xApiKey = 'ratelimitedkey';
+      await redis.set(
+        `accessKeyDetails:${xApiKey}`,
+        JSON.stringify({
+          accessKey: xApiKey,
+          limit: requestLimit, // this should be limit per min
+          disabled: false,
+          expiry: new Date().getTime() + 1000 * 60 * 60 * 24,
+        }),
+      );
 
-    for (let i = 0; i < requestLimit; i++) {
-      await request(app.getHttpServer())
+      for (let i = 0; i < requestLimit; i++) {
+        await request(app.getHttpServer())
+          .get('/tokens/bitcoin')
+          .expect(HttpStatus.OK)
+          .set('x-api-key', xApiKey);
+      }
+
+      return request(app.getHttpServer())
         .get('/tokens/bitcoin')
-        .expect(HttpStatus.OK)
+        .expect(HttpStatus.TOO_MANY_REQUESTS)
         .set('x-api-key', xApiKey);
-    }
-
-    return request(app.getHttpServer())
-      .get('/tokens/bitcoin')
-      .expect(HttpStatus.TOO_MANY_REQUESTS)
-      .set('x-api-key', xApiKey);
+    });
   });
 });

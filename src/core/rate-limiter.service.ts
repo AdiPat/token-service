@@ -47,7 +47,7 @@ export class RateLimiterService {
       runningRateLimit = {
         accessKeyValue: accessKeyDetails.accessKey,
         interval: 60,
-        remainingLimit: accessKeyDetails.limitPerSecond,
+        remainingLimit: accessKeyDetails.limit,
         lastReset: new Date(),
       };
 

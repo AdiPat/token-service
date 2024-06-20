@@ -41,7 +41,7 @@ class AccessKeyCache_ {
         const accessKeyDetails = JSON.parse(
           accessKeyDetailsJson,
         ) as AccessKeyDetails;
-        runningRateLimits.remainingLimit = accessKeyDetails.limitPerSecond;
+        runningRateLimits.remainingLimit = accessKeyDetails.limit;
         redis.set(key, JSON.stringify(runningRateLimits));
       });
     }, 60 * 1000); // hardcoded to update every minute for now
