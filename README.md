@@ -1,6 +1,6 @@
-# Plena Token Service
+# Token Service
 
-**Plena Finance:** Web3 Token Information API with dynamic rate-limiting. 🪙
+Web3 Token Information API with dynamic rate-limiting. 🪙
 
 # Setup
 
